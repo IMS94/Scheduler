@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  *
  * @author Imesha Sudasingha
  */
-public class Process implements Comparable{
+public class Process{
     
     //service time is set when initializing
     //arrival time to be set manually
@@ -32,6 +32,8 @@ public class Process implements Comparable{
         this.name=name;
         this.serviceTime=serviceTime;
         finished=false;
+        
+        executedTime=0;
     }
     
     
@@ -64,11 +66,12 @@ public class Process implements Comparable{
      */
     public boolean execute(int slice){
         if(executedTime>=serviceTime){
+            finished=true;
             return false;
         }
         
         int time;
-        if(executedTime+slice>serviceTime){
+        if(executedTime+slice>=serviceTime){
            time=serviceTime-executedTime; 
            finished=true;
         }
@@ -78,17 +81,18 @@ public class Process implements Comparable{
         
         //sleep the thread for the slice or the remaining time and then return
         try {
+        
+            System.out.println(name+" running...");
             Thread.sleep(time);
         } catch (InterruptedException ex) {
             Logger.getLogger(Process.class.getName()).log(Level.SEVERE, null, ex);
         }
+        executedTime+=time;
         
+        System.out.println(name+" Queued");
         return is_blocked;
     }
 
-    @Override
-    public int compareTo(Object o) {
-        return 0;
-    }
+ 
     
 }

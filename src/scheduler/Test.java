@@ -14,7 +14,7 @@ public class Test {
         Process[] processes=new Process[5];
         
         for(int x=0;x<5;x++){
-            processes[x]=new Process(x+5,"Process "+x);
+            processes[x]=new Process((x+2)*1000,"Process "+x);
         }
         
         Scheduler scheduler=new Scheduler(processes, 1000);
