@@ -55,6 +55,9 @@ public class Scheduler extends Thread{
             else{
                 //change the process
                 time=System.currentTimeMillis();
+                if(currentProcess!=null && !currentProcess.hasFinished()){
+                    readyQueue.add(currentProcess);
+                }
             }
             
             if(!auxiliaryQueue.isEmpty()){
@@ -67,7 +70,9 @@ public class Scheduler extends Thread{
                 //havent think about the way to check blocked queue.
             }
             
-            
+            if(currentProcess!=null){
+                currentProcess.execute(timeSlice);
+            }
             
             //all the queues should be finished to finish the sheduler
             if(readyQueue.isEmpty() && auxiliaryQueue.isEmpty() && blockedQueue.isEmpty()){
