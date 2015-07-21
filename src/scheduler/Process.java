@@ -5,6 +5,7 @@
  */
 package scheduler;
 
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +19,7 @@ public class Process{
     //arrival time to be set manually
     
     
-    private int serviceTime,arrivalTime,waitingTime,executedTime;
+    private int serviceTime,arrivalTime,waitingTime,executedTime,block_at;
     Long lastExecutedTime;
     private String name;
     boolean is_blocked,finished;
@@ -33,6 +34,11 @@ public class Process{
         this.name=name;
         this.serviceTime=serviceTime;
         finished=false;
+        
+        //set the block at time. Process should be added to the blocked queue
+        // when this time arrive.
+        Random rand=new Random();
+        block_at=rand.nextInt(serviceTime-1)+1;
         
         executedTime=0;
         waitingTime=0;
@@ -120,7 +126,6 @@ public class Process{
         
         //sleep the thread for the slice or the remaining time and then return
         try {
-        
             System.out.println(name+" running...");
             Thread.sleep(time);
         } catch (InterruptedException ex) {
