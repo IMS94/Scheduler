@@ -41,6 +41,8 @@ public class Scheduler extends Thread{
     @Override
     public void run(){
         totalTime=0;
+        
+        //time to keep track of time slices
         long time=System.currentTimeMillis();
         boolean executing=true;
         
@@ -51,6 +53,7 @@ public class Scheduler extends Thread{
                 continue;
             }
             else{
+                //change the process
                 time=System.currentTimeMillis();
             }
             
@@ -61,7 +64,7 @@ public class Scheduler extends Thread{
                 currentProcess=readyQueue.remove();
             }
             else{
-                
+                //havent think about the way to check blocked queue.
             }
             
             
