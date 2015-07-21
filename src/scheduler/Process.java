@@ -19,12 +19,13 @@ public class Process{
     
     
     private int serviceTime,arrivalTime,waitingTime,executedTime;
-    Long startTime;
+    Long lastExecutedTime;
     private String name;
     boolean is_blocked,finished;
     
     /**
      * All the time should be in milli seconds
+     * Last Executed time is to calculate waiting time.
      * @param serviceTime
      * @param name 
      */
@@ -34,12 +35,30 @@ public class Process{
         finished=false;
         
         executedTime=0;
+        waitingTime=0;
+        arrivalTime=-1;
+        lastExecutedTime=System.currentTimeMillis();
     }
     
     
-    //set the arrival time of the process.
+    /**
+     * Set the arrival time of a process
+     * Arrival time is only set once.
+     * @param arrivalTime 
+     */
     public void setArrivalTime(int arrivalTime){
+        if(this.arrivalTime!=-1){
+            return;
+        }
         this.arrivalTime=arrivalTime;
+    }
+    
+    /**
+     * Get the arrival time of the process.
+     * @return 
+     */
+    public int getArrivalTime(){
+        return arrivalTime;
     }
     
     
@@ -49,6 +68,24 @@ public class Process{
     
     public void unblock(){
         is_blocked=false;
+    }
+    
+    /**
+     * Return the waiting time of the given process.
+     * @return 
+     */
+    public int getWaitingTime(){
+        return waitingTime;
+    }
+    
+    
+    /**
+     * To get the executed time of a given process
+     * Executed time is the total time spent executing the process.
+     * @return 
+     */
+    public int getExcecutedTime(){
+        return executedTime;
     }
     
     /**
@@ -65,10 +102,12 @@ public class Process{
      * @return 
      */
     public boolean execute(int slice){
+               
         if(executedTime>=serviceTime){
             finished=true;
             return false;
         }
+        waitingTime+=(System.currentTimeMillis()-lastExecutedTime);
         
         int time;
         if(executedTime+slice>=serviceTime){
@@ -88,8 +127,8 @@ public class Process{
             Logger.getLogger(Process.class.getName()).log(Level.SEVERE, null, ex);
         }
         executedTime+=time;
+        lastExecutedTime=System.currentTimeMillis();
         
-        System.out.println(name+" Queued");
         return is_blocked;
     }
 

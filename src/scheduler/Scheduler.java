@@ -44,8 +44,9 @@ public class Scheduler extends Thread {
     public void run() {
         totalTime = 0;
 
+        long startTime=System.currentTimeMillis();
         //time to keep track of time slices
-        long time = System.currentTimeMillis();
+        long time;
         boolean executing = true;
 
         Process currentProcess = null;
@@ -70,6 +71,9 @@ public class Scheduler extends Thread {
                 currentProcess.execute(timeSlice);
             }
 
+            
+            totalTime=(System.currentTimeMillis()-startTime);
+            
             //all the queues should be finished to finish the sheduler
             if (readyQueue.isEmpty() && auxiliaryQueue.isEmpty() && blockedQueue.isEmpty()) {
                 executing = false;

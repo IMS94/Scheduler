@@ -17,7 +17,7 @@ public class Test {
             processes[x]=new Process((x+2)*1000,"Process "+x);
         }
         
-        Scheduler scheduler=new Scheduler(processes, 1000);
+        Scheduler scheduler=new Scheduler(processes, 3000);
         scheduler.start();
     }
 }
