@@ -83,6 +83,9 @@ public class Scheduler extends Thread {
                 currentProcess = readyQueue.remove();
             } else {
                 //havent think about the way to check blocked queue.
+                if(!blockedQueue.isEmpty()){
+                    continue;
+                }
                 currentProcess = null;
             }
 

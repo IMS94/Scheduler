@@ -22,7 +22,7 @@ public class Process{
     private int serviceTime,arrivalTime,waitingTime,executedTime,block_at,blocked_for;
     Long lastExecutedTime,blocked_at;
     private String name;
-    boolean is_blocked,finished;
+    boolean is_blocked,finished,blockedOnce;
     
     /**
      * All the time should be in milli seconds
@@ -34,6 +34,7 @@ public class Process{
         this.name=name;
         this.serviceTime=serviceTime;
         finished=false;
+        blockedOnce=false;
         
         //set the block_at time. Process should be added to the blocked queue
         // when this time arrive.
@@ -85,7 +86,7 @@ public class Process{
      * @return 
      */
     public boolean isBlocked(){
-        if(is_blocked && (blocked_at+blocked_for)<=System.currentTimeMillis()){
+        if(is_blocked && !hasFinished() && (blocked_at+blocked_for)<=System.currentTimeMillis()){
             is_blocked=false;
             
             System.out.println("Process "+name+" unblocked!");
@@ -118,6 +119,9 @@ public class Process{
      * @return 
      */
     public boolean hasFinished(){
+        if(finished){
+            System.out.println("Process "+name+" s="+serviceTime+" e="+executedTime+" w="+waitingTime);
+        }
         return finished;
     }
     
@@ -132,6 +136,7 @@ public class Process{
         //process is finished is the executed time is greater than service time.
         if(executedTime>=serviceTime){
             finished=true;
+            waitingTime+=(System.currentTimeMillis()-lastExecutedTime);
             return false;
         }
         // + the time since the last executed time.
@@ -156,12 +161,14 @@ public class Process{
             
             long startTime=System.currentTimeMillis();
             while(startTime+time>System.currentTimeMillis()){
-                if(executedTime+(System.currentTimeMillis()-startTime)>=block_at){
-                    
+                if(!blockedOnce && !finished && executedTime+(System.currentTimeMillis()-startTime)>=block_at){
+                    blockedOnce=true;
                     //process is just blocked. Blocked_at will retain the time it was blocked.
                     is_blocked=true;
                     blocked_at=System.currentTimeMillis();
                     executedTime+=(System.currentTimeMillis()-startTime);
+                    lastExecutedTime=System.currentTimeMillis();
+                    System.out.println("Process "+name+" blocked");
                     return true;
                 }
                 
@@ -174,7 +181,7 @@ public class Process{
         executedTime+=time;
         lastExecutedTime=System.currentTimeMillis();
         
-        return is_blocked;
+        return false;
     }
 
  
