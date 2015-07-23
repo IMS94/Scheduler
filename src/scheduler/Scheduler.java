@@ -17,7 +17,7 @@ import java.util.Queue;
 public class Scheduler extends Thread {
 
     private int processCount, timeSlice;
-    long totalTime;
+    private long totalTime;
     private Queue<Process> readyQueue, auxiliaryQueue;
     LinkedList<Process> blockedQueue;
 
@@ -91,6 +91,7 @@ public class Scheduler extends Thread {
 
             boolean is_blocked=false;
             if (currentProcess != null && !currentProcess.hasFinished()) {
+                currentProcess.setArrivalTime(totalTime);
                 is_blocked=currentProcess.execute(timeSlice);
                 if(is_blocked){
                     blockedQueue.add(currentProcess);

@@ -19,8 +19,8 @@ public class Process{
     //arrival time to be set manually
     
     
-    private int serviceTime,arrivalTime,waitingTime,executedTime,block_at,blocked_for;
-    Long lastExecutedTime,blocked_at;
+    private int serviceTime,waitingTime,executedTime,block_at,blocked_for;
+    Long lastExecutedTime,blocked_at,arrivalTime;
     private String name;
     boolean is_blocked,finished,blockedOnce;
     
@@ -46,17 +46,25 @@ public class Process{
         
         executedTime=0;
         waitingTime=0;
-        arrivalTime=-1;
+        arrivalTime=-1L;
         lastExecutedTime=System.currentTimeMillis();
     }
     
+    
+    /**
+     * Returns the name of the process
+     * @return 
+     */
+    public String getName(){
+        return name;
+    }
     
     /**
      * Set the arrival time of a process
      * Arrival time is only set once.
      * @param arrivalTime 
      */
-    public void setArrivalTime(int arrivalTime){
+    public void setArrivalTime(long arrivalTime){
         if(this.arrivalTime!=-1){
             return;
         }
@@ -67,10 +75,18 @@ public class Process{
      * Get the arrival time of the process.
      * @return 
      */
-    public int getArrivalTime(){
+    public long getArrivalTime(){
         return arrivalTime;
     }
     
+    
+    public int getServiceTime(){
+        return serviceTime;
+    }
+    
+    public int getTimeRemaining(){
+        return (serviceTime-executedTime);
+    }
     
     public void block(){
         is_blocked=true;

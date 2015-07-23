@@ -5,6 +5,13 @@
  */
 package scheduler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+import javafx.print.Collation;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Imesha Sudasingha
@@ -16,6 +23,7 @@ public class MainWindow extends javax.swing.JFrame {
      */
     public MainWindow() {
         initComponents();
+        processes=new ArrayList<>();
     }
 
     /**
@@ -41,6 +49,11 @@ public class MainWindow extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         startButton.setText("Start");
+        startButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                startButtonActionPerformed(evt);
+            }
+        });
 
         stopButton.setText("Stop");
         stopButton.addActionListener(new java.awt.event.ActionListener() {
@@ -171,9 +184,38 @@ public class MainWindow extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_stopButtonActionPerformed
 
+    private int processCount=0;
+    private List<Process> processes;
+    private Scheduler scheduler;
     private void addProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addProcessButtonActionPerformed
-        // TODO add your handling code here:
+        if(processCount>10){
+            return;
+        }
+        
+        Random rand=new Random();
+        processCount++;
+                
+        //service time in milliseconds.
+        int serviceTime=(rand.nextInt(10)+3)*1000;
+        Process process=new Process(serviceTime,"Process "+processCount);
+        Object row[]=new Object[4];
+        row[0]=process.getName();
+        row[1]=process.getServiceTime();
+        row[2]=0;
+        row[3]=process.getTimeRemaining();
+        processes.add(process);
+        ((DefaultTableModel)table.getModel()).addRow(row);
     }//GEN-LAST:event_addProcessButtonActionPerformed
+
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
+        if(processCount<5){
+            return;
+        }
+        Process[] p=new Process[processes.size()];
+        processes.toArray(p);
+        scheduler=new Scheduler(p,2000);
+        scheduler.start();
+    }//GEN-LAST:event_startButtonActionPerformed
 
     /**
      * @param args the command line arguments
