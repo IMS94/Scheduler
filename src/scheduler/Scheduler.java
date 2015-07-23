@@ -5,6 +5,7 @@
  */
 package scheduler;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -17,7 +18,8 @@ public class Scheduler extends Thread {
 
     private int processCount, timeSlice;
     long totalTime;
-    private Queue<Process> readyQueue, auxiliaryQueue, blockedQueue;
+    private Queue<Process> readyQueue, auxiliaryQueue;
+    LinkedList<Process> blockedQueue;
 
     /*
      Time slice in mili seconds.
@@ -52,6 +54,23 @@ public class Scheduler extends Thread {
         Process currentProcess = null;
 
         while (executing) {
+            
+            /**
+             * First we should check the blocked queue if it has any unblocked processes.
+             * If yes add it to the auxiliary queue.
+             */
+            if(!blockedQueue.isEmpty()){
+                Iterator<Process> iter=blockedQueue.iterator();
+                
+                while(iter.hasNext()){
+                    Process p=iter.next();
+                    if(!p.isBlocked()){
+                        iter.remove();
+                        auxiliaryQueue.add(p);
+                    }
+                }
+            }
+            
             //change the process
             time = System.currentTimeMillis();
             if (currentProcess != null && !currentProcess.hasFinished()) {
@@ -67,10 +86,15 @@ public class Scheduler extends Thread {
                 currentProcess = null;
             }
 
+            boolean is_blocked=false;
             if (currentProcess != null && !currentProcess.hasFinished()) {
-                currentProcess.execute(timeSlice);
+                is_blocked=currentProcess.execute(timeSlice);
+                if(is_blocked){
+                    blockedQueue.add(currentProcess);
+                    currentProcess=null;
+                }
             }
-
+            
             
             totalTime=(System.currentTimeMillis()-startTime);
             

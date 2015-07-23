@@ -19,8 +19,8 @@ public class Process{
     //arrival time to be set manually
     
     
-    private int serviceTime,arrivalTime,waitingTime,executedTime,block_at;
-    Long lastExecutedTime;
+    private int serviceTime,arrivalTime,waitingTime,executedTime,block_at,blocked_for;
+    Long lastExecutedTime,blocked_at;
     private String name;
     boolean is_blocked,finished;
     
@@ -35,10 +35,13 @@ public class Process{
         this.serviceTime=serviceTime;
         finished=false;
         
-        //set the block at time. Process should be added to the blocked queue
+        //set the block_at time. Process should be added to the blocked queue
         // when this time arrive.
         Random rand=new Random();
         block_at=rand.nextInt(serviceTime-1)+1;
+        
+        //blocked_for determines, for how long the process to be kept blocked.
+        blocked_for=(rand.nextInt(5)+1)*1000;
         
         executedTime=0;
         waitingTime=0;
@@ -77,6 +80,22 @@ public class Process{
     }
     
     /**
+     * Determines if a process is blocked at the moment.
+     * Checked by comparing the time it was blocked and the time for which it should be blocked. 
+     * @return 
+     */
+    public boolean isBlocked(){
+        if(is_blocked && (blocked_at+blocked_for)<=System.currentTimeMillis()){
+            is_blocked=false;
+            
+            System.out.println("Process "+name+" unblocked!");
+            return false;
+        }
+        return is_blocked;
+    }
+    
+    
+    /**
      * Return the waiting time of the given process.
      * @return 
      */
@@ -104,15 +123,18 @@ public class Process{
     
     /**
      * Process will execute for the time slice or the remaining time.
+     * Process have to be blocked at the given time(randomly assigned)
      * @param slice
      * @return 
      */
     public boolean execute(int slice){
-               
+        
+        //process is finished is the executed time is greater than service time.
         if(executedTime>=serviceTime){
             finished=true;
             return false;
         }
+        // + the time since the last executed time.
         waitingTime+=(System.currentTimeMillis()-lastExecutedTime);
         
         int time;
@@ -124,10 +146,28 @@ public class Process{
             time=slice;
         }
         
-        //sleep the thread for the slice or the remaining time and then return
+        /**
+         *  sleep the thread for the slice or the remaining time and then return.
+         * While being executed, we have to check whether the process have to be blocked.
+         */
         try {
+            
             System.out.println(name+" running...");
-            Thread.sleep(time);
+            
+            long startTime=System.currentTimeMillis();
+            while(startTime+time>System.currentTimeMillis()){
+                if(executedTime+(System.currentTimeMillis()-startTime)>=block_at){
+                    
+                    //process is just blocked. Blocked_at will retain the time it was blocked.
+                    is_blocked=true;
+                    blocked_at=System.currentTimeMillis();
+                    executedTime+=(System.currentTimeMillis()-startTime);
+                    return true;
+                }
+                
+                Thread.sleep(10);
+            }
+            
         } catch (InterruptedException ex) {
             Logger.getLogger(Process.class.getName()).log(Level.SEVERE, null, ex);
         }
