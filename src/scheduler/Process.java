@@ -136,7 +136,7 @@ public class Process{
      */
     public boolean hasFinished(){
         if(finished){
-            System.out.println("Process: "+name+" service time="+serviceTime+" executed time="+executedTime+" waiting time="+waitingTime);
+            System.out.println("Process: "+name+" Arrival Time="+arrivalTime+" service time="+serviceTime+" executed time="+executedTime+" waiting time="+waitingTime);
         }
         return finished;
     }
@@ -177,7 +177,8 @@ public class Process{
             
             long startTime=System.currentTimeMillis();
             while(startTime+time>System.currentTimeMillis()){
-                if(!blockedOnce && !finished && executedTime+(System.currentTimeMillis()-startTime)>=block_at){
+                if(!blockedOnce && !finished && 
+                        executedTime+(System.currentTimeMillis()-startTime)>=block_at){
                     blockedOnce=true;
                     //process is just blocked. Blocked_at will retain the time it was blocked.
                     is_blocked=true;

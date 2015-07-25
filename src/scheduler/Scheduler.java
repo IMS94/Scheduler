@@ -103,7 +103,8 @@ public class Scheduler extends Thread {
             totalTime=(System.currentTimeMillis()-startTime);
             
             //all the queues should be finished to finish the sheduler
-            if (readyQueue.isEmpty() && auxiliaryQueue.isEmpty() && blockedQueue.isEmpty()) {
+            if (readyQueue.isEmpty() && auxiliaryQueue.isEmpty() 
+                    && blockedQueue.isEmpty() && currentProcess==null) {
                 executing = false;
             }
 
