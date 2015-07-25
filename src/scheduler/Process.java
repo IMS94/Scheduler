@@ -136,7 +136,7 @@ public class Process{
      */
     public boolean hasFinished(){
         if(finished){
-            System.out.println("Process "+name+" s="+serviceTime+" e="+executedTime+" w="+waitingTime);
+            System.out.println("Process: "+name+" service time="+serviceTime+" executed time="+executedTime+" waiting time="+waitingTime);
         }
         return finished;
     }
