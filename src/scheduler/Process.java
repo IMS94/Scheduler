@@ -5,6 +5,7 @@
  */
 package scheduler;
 
+import java.awt.Color;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,23 +19,27 @@ public class Process{
     //service time is set when initializing
     //arrival time to be set manually
     
-    
+    private int processNumber;
     private int serviceTime,waitingTime,executedTime,block_at,blocked_for;
     Long lastExecutedTime,blocked_at,arrivalTime;
     private String name;
     boolean is_blocked,finished,blockedOnce;
-    
+    private Color color;
+   
     /**
      * All the time should be in milli seconds
      * Last Executed time is to calculate waiting time.
      * @param serviceTime
      * @param name 
      */
-    public Process(int serviceTime,String name){
+    public Process(int serviceTime,String name,int processNumber,Color color){
         this.name=name;
         this.serviceTime=serviceTime;
         finished=false;
         blockedOnce=false;
+        
+        this.processNumber=processNumber;
+        this.color=color;
         
         //set the block_at time. Process should be added to the blocked queue
         // when this time arrive.
@@ -59,6 +64,13 @@ public class Process{
         return name;
     }
     
+    public int getProcessNumber(){
+        return processNumber;
+    }
+    
+    public Color getColor(){
+        return color;
+    }
     /**
      * Set the arrival time of a process
      * Arrival time is only set once.

@@ -5,6 +5,8 @@
  */
 package scheduler;
 
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Imesha Sudasingha
@@ -14,10 +16,10 @@ public class Test {
         Process[] processes=new Process[5];
         
         for(int x=0;x<5;x++){
-            processes[x]=new Process((x+2)*1000,"Process "+x);
+            //processes[x]=new Process((x+2)*1000,"Process "+x,x);
         }
         
-        Scheduler scheduler=new Scheduler(processes, 3000);
-        scheduler.start();
+        //Scheduler scheduler=new Scheduler(processes, 3000,null);
+        //scheduler.start();
     }
 }

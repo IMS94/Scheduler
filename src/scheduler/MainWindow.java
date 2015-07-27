@@ -7,12 +7,14 @@ package scheduler;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Panel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 //import javafx.print.Collation;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -20,17 +22,40 @@ import javax.swing.table.DefaultTableModel;
  * @author Imesha Sudasingha
  */
 public class MainWindow extends javax.swing.JFrame {
-
+    
     private int processCount = 0;
-    private List<Process> processes;
+    List<Process> processes;
     private Scheduler scheduler;
-
+    JPanel timeline;
+    private Color[] colors={Color.BLUE,Color.RED,Color.GRAY,Color.ORANGE,Color.GREEN,Color.PINK,Color.YELLOW, 
+        Color.CYAN,Color.MAGENTA};
     /**
      * Creates new form MainWindow
      */
     public MainWindow() {
         initComponents();
         processes = new ArrayList<>();
+        
+        timeline = new JPanel() {
+            @Override
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                this.setBackground(Color.WHITE);
+                int cord = 0;
+                for (Process p : processes) {
+                    cord += 25;
+                    g.setColor(p.getColor());
+                    g.fillRect(cord, 10, 20, 80);
+                    
+                    g.setColor(Color.WHITE);
+                    
+                    g.drawString("P "+p.getProcessNumber(), cord, 25);
+                    
+                }
+            }
+        };
+        timeline.setSize(1000, 100);
+        bottomPanel.add(timeline);
     }
 
     /**
@@ -54,20 +79,7 @@ public class MainWindow extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
         bottomRightPanel = new javax.swing.JPanel();
-        bottomLeftPanel = new javax.swing.JPanel(){
-            public void paint(Graphics g){
-                this.setBackground(Color.WHITE);
-                int cord=0;
-                for(int x=0;x<20;x++){
-                    cord+=20;
-                    g.setColor(Color.BLACK);
-                    g.fillRect(cord, 10, 15,80);
-                    g.setColor(Color.WHITE);
-                    g.drawString(Integer.toString(x), cord, 25);
-                    g.drawString(Integer.toString(x), cord, 25+60);
-                }
-            }
-        };
+        bottomPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -184,14 +196,14 @@ public class MainWindow extends javax.swing.JFrame {
             .addGap(0, 91, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout bottomLeftPanelLayout = new javax.swing.GroupLayout(bottomLeftPanel);
-        bottomLeftPanel.setLayout(bottomLeftPanelLayout);
-        bottomLeftPanelLayout.setHorizontalGroup(
-            bottomLeftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout bottomPanelLayout = new javax.swing.GroupLayout(bottomPanel);
+        bottomPanel.setLayout(bottomPanelLayout);
+        bottomPanelLayout.setHorizontalGroup(
+            bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        bottomLeftPanelLayout.setVerticalGroup(
-            bottomLeftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        bottomPanelLayout.setVerticalGroup(
+            bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 158, Short.MAX_VALUE)
         );
 
@@ -205,7 +217,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addComponent(topRightPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(bottomLeftPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(bottomPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(bottomRightPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -220,7 +232,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addGap(28, 28, 28)
                 .addComponent(bottomRightPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(bottomLeftPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(bottomPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -241,23 +253,31 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
         scheduler.stop();
+        
+        DefaultTableModel dt = (DefaultTableModel) table.getModel();
+        int rows = dt.getRowCount();
+        for (int i = rows - 1; i >= 0; i--) {
+            dt.removeRow(i);
+        }
+        
         System.out.println("Scheduler stopped...");
         System.out.println("");
     }//GEN-LAST:event_stopButtonActionPerformed
-
+    
 
     private void addProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addProcessButtonActionPerformed
         if (processCount > 10) {
             return;
         }
-
+        
         Random rand = new Random();
         processCount++;
 
         //service time in milliseconds.
         int serviceTime = (rand.nextInt(10) + 3) * 1000;
         
-        Process process = new Process(serviceTime, "Process " + processCount);
+        Process process = new Process(serviceTime, "Process " + processCount, processCount,
+                colors[processCount-1]);
         
         Object row[] = new Object[4];
         row[0] = process.getName();
@@ -274,19 +294,20 @@ public class MainWindow extends javax.swing.JFrame {
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         if (processCount < 5) {
             
-            JOptionPane.showMessageDialog (null, "Please add five or more processes and continue", "Invalid process number", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Please add five or more processes and continue", "Invalid process number", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         Process[] p = new Process[processes.size()];
         processes.toArray(p);
-        scheduler = new Scheduler(p, 2000);
+        scheduler = new Scheduler(p, 2000, (DefaultTableModel) table.getModel(),timeline,this);
+        processes.clear();
         scheduler.start();
 
     }//GEN-LAST:event_startButtonActionPerformed
 
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
-
-        DefaultTableModel dt = (DefaultTableModel)table.getModel();
+        
+        DefaultTableModel dt = (DefaultTableModel) table.getModel();
         int rows = dt.getRowCount();
         for (int i = rows - 1; i >= 0; i--) {
             dt.removeRow(i);
@@ -341,7 +362,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addProcessButton;
-    private javax.swing.JPanel bottomLeftPanel;
+    private javax.swing.JPanel bottomPanel;
     private javax.swing.JPanel bottomRightPanel;
     private javax.swing.JButton clearButton;
     private javax.swing.JLabel jLabel1;

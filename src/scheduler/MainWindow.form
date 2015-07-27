@@ -45,7 +45,7 @@
               </Group>
               <Group type="102" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="bottomLeftPanel" alignment="0" max="32767" attributes="0"/>
+                      <Component id="bottomPanel" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="bottomRightPanel" max="32767" attributes="0"/>
@@ -65,7 +65,7 @@
                   <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
                   <Component id="bottomRightPanel" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="bottomLeftPanel" max="32767" attributes="0"/>
+                  <Component id="bottomPanel" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -272,9 +272,9 @@
             </DimensionLayout>
           </Layout>
         </Container>
-        <Container class="javax.swing.JPanel" name="bottomLeftPanel">
+        <Container class="javax.swing.JPanel" name="bottomPanel">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JPanel(){&#xa;    public void paint(Graphics g){&#xa;        this.setBackground(Color.WHITE);&#xa;        int cord=0;&#xa;        for(int x=0;x&lt;20;x++){&#xa;            cord+=20;&#xa;g.setColor(Color.BLACK);            &#xa;g.fillRect(cord, 10, 15,80);&#xa;g.setColor(Color.WHITE);&#xa;            g.drawString(Integer.toString(x), cord, 25);&#xa;            g.drawString(Integer.toString(x), cord, 25+60);&#xa;        }&#xa;    }&#xa;}"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JPanel()"/>
           </AuxValues>
 
           <Layout>

@@ -9,6 +9,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -20,14 +23,21 @@ public class Scheduler extends Thread {
     private long totalTime;
     private Queue<Process> readyQueue, auxiliaryQueue;
     LinkedList<Process> blockedQueue;
-
+    private DefaultTableModel tableModel;
+    private JPanel timeline;
+    private MainWindow window;
     /*
      Time slice in mili seconds.
      */
-    public Scheduler(Process[] processes, int timeSlice) {
+    public Scheduler(Process[] processes, int timeSlice,DefaultTableModel model,
+            JPanel timeline,MainWindow window) {
         this.processCount = processes.length;
         this.timeSlice = timeSlice;
 
+        this.tableModel=model;
+        this.timeline=timeline;
+        this.window=window;
+        
         readyQueue = new LinkedList<>();
         auxiliaryQueue = new LinkedList<>();
         blockedQueue = new LinkedList<>();
@@ -93,10 +103,22 @@ public class Scheduler extends Thread {
             if (currentProcess != null && !currentProcess.hasFinished()) {
                 currentProcess.setArrivalTime(totalTime);
                 is_blocked=currentProcess.execute(timeSlice);
+                
+                /*
+                Update the table according to the changes in processes.
+                */
+                window.processes.add(currentProcess);
+                
+                tableModel.setValueAt(currentProcess.getArrivalTime(), 
+                        currentProcess.getProcessNumber()-1,2 );
+                tableModel.setValueAt(currentProcess.getServiceTime()-currentProcess.getExcecutedTime()
+                        , currentProcess.getProcessNumber()-1,3 );
+                timeline.repaint();
                 if(is_blocked){
                     blockedQueue.add(currentProcess);
                     currentProcess=null;
                 }
+                
             }
             
             
