@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -21,23 +22,24 @@ public class Scheduler extends Thread {
 
     private int processCount, timeSlice;
     private long totalTime;
-    private Queue<Process> readyQueue, auxiliaryQueue;
+    Queue<Process> readyQueue, auxiliaryQueue;
     LinkedList<Process> blockedQueue;
-    private DefaultTableModel tableModel;
+    private final DefaultTableModel tableModel;
     private JPanel timeline;
     private MainWindow window;
     /*
      Time slice in mili seconds.
      */
-    public Scheduler(Process[] processes, int timeSlice,DefaultTableModel model,
-            JPanel timeline,MainWindow window) {
+
+    public Scheduler(Process[] processes, int timeSlice, DefaultTableModel model,
+            JPanel timeline, MainWindow window) {
         this.processCount = processes.length;
         this.timeSlice = timeSlice;
 
-        this.tableModel=model;
-        this.timeline=timeline;
-        this.window=window;
-        
+        this.tableModel = model;
+        this.timeline = timeline;
+        this.window = window;
+
         readyQueue = new LinkedList<>();
         auxiliaryQueue = new LinkedList<>();
         blockedQueue = new LinkedList<>();
@@ -56,7 +58,7 @@ public class Scheduler extends Thread {
     public void run() {
         totalTime = 0;
 
-        long startTime=System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         //time to keep track of time slices
         long time;
         boolean executing = true;
@@ -64,23 +66,46 @@ public class Scheduler extends Thread {
         Process currentProcess = null;
 
         while (executing) {
-            
+
+            SwingUtilities.invokeLater(
+                    new Runnable() {
+                        public void run() {
+                            timeline.repaint();
+                            window.readyQueuePanel.repaint();
+                            window.blockedQueuePanel.repaint();
+                            window.auxiliaryQueuePanel.repaint();
+                        }
+                    }
+            );
+
             /**
-             * First we should check the blocked queue if it has any unblocked processes.
-             * If yes add it to the auxiliary queue.
+             * First we should check the blocked queue if it has any unblocked
+             * processes. If yes add it to the auxiliary queue.
              */
-            if(!blockedQueue.isEmpty()){
-                Iterator<Process> iter=blockedQueue.iterator();
-                
-                while(iter.hasNext()){
-                    Process p=iter.next();
-                    if(!p.isBlocked()){
+            if (!blockedQueue.isEmpty()) {
+                Iterator<Process> iter = blockedQueue.iterator();
+
+                while (iter.hasNext()) {
+                    Process p = iter.next();
+                    if (!p.isBlocked()) {
                         iter.remove();
                         auxiliaryQueue.add(p);
                     }
                 }
             }
             
+            SwingUtilities.invokeLater(
+                    new Runnable() {
+                        public void run() {
+                            window.auxiliaryQueuePanel.repaint();
+                            timeline.repaint();
+                            window.readyQueuePanel.repaint();
+                            window.blockedQueuePanel.repaint();
+                            
+                        }
+                    }
+            );
+
             //change the process
             time = System.currentTimeMillis();
             if (currentProcess != null && !currentProcess.hasFinished()) {
@@ -93,40 +118,74 @@ public class Scheduler extends Thread {
                 currentProcess = readyQueue.remove();
             } else {
                 //havent think about the way to check blocked queue.
-                if(!blockedQueue.isEmpty()){
+                if (!blockedQueue.isEmpty()) {
                     continue;
                 }
                 currentProcess = null;
             }
 
-            boolean is_blocked=false;
+            boolean is_blocked = false;
             if (currentProcess != null && !currentProcess.hasFinished()) {
                 currentProcess.setArrivalTime(totalTime);
-                is_blocked=currentProcess.execute(timeSlice);
                 
+                final int progress=(int)(((float)currentProcess.getExcecutedTime())
+                        /((float)currentProcess.getServiceTime())*100);
+                
+                final String p1=currentProcess.getName();
+                
+                SwingUtilities.invokeLater(
+                        new Runnable() {
+                            public void run() {
+                                timeline.repaint();
+                                window.readyQueuePanel.repaint();
+                                window.blockedQueuePanel.repaint();
+                                window.auxiliaryQueuePanel.repaint();
+                                window.currentProcessLabel.setText("Current Process : "+p1);
+                                window.progressBar.setValue(progress);
+                            }
+                        }
+                );
+
+                is_blocked = currentProcess.execute(timeSlice);
+
                 /*
-                Update the table according to the changes in processes.
-                */
+                 Update the table according to the changes in processes.
+                 */
                 window.processes.add(currentProcess);
+
+                tableModel.setValueAt(currentProcess.getArrivalTime(),
+                        currentProcess.getProcessNumber() - 1, 2);
+                tableModel.setValueAt(currentProcess.getServiceTime() - currentProcess.getExcecutedTime()
+                        , currentProcess.getProcessNumber() - 1, 3);
                 
-                tableModel.setValueAt(currentProcess.getArrivalTime(), 
-                        currentProcess.getProcessNumber()-1,2 );
-                tableModel.setValueAt(currentProcess.getServiceTime()-currentProcess.getExcecutedTime()
-                        , currentProcess.getProcessNumber()-1,3 );
-                timeline.repaint();
-                if(is_blocked){
+                final int progress2=(int)(((float)currentProcess.getExcecutedTime())
+                        /((float)currentProcess.getServiceTime())*100);
+                final String p2=currentProcess.getName();
+                
+                SwingUtilities.invokeLater(
+                        new Runnable() {
+                            public void run() {
+                                timeline.repaint();
+                                window.readyQueuePanel.repaint();
+                                window.blockedQueuePanel.repaint();
+                                window.auxiliaryQueuePanel.repaint();
+                                window.currentProcessLabel.setText("Current Process : "+p2);
+                                window.progressBar.setValue(progress2);
+                            }
+                        }
+                );
+                if (is_blocked) {
                     blockedQueue.add(currentProcess);
-                    currentProcess=null;
+                    currentProcess = null;
                 }
-                
+
             }
-            
-            
-            totalTime=(System.currentTimeMillis()-startTime);
-            
+
+            totalTime = (System.currentTimeMillis() - startTime);
+
             //all the queues should be finished to finish the sheduler
-            if (readyQueue.isEmpty() && auxiliaryQueue.isEmpty() 
-                    && blockedQueue.isEmpty() && currentProcess==null) {
+            if (readyQueue.isEmpty() && auxiliaryQueue.isEmpty()
+                    && blockedQueue.isEmpty() && currentProcess == null) {
                 executing = false;
             }
 
