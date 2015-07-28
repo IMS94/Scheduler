@@ -25,7 +25,7 @@ public class Scheduler extends Thread {
 
     private int processCount, timeSlice;
     private long totalTime;
-    Queue<Process> readyQueue, auxiliaryQueue,jobQueue;
+    Queue<Process> readyQueue, auxiliaryQueue, jobQueue;
     LinkedList<Process> blockedQueue;
     private final DefaultTableModel tableModel;
     private JPanel timeline;
@@ -46,7 +46,7 @@ public class Scheduler extends Thread {
         readyQueue = new LinkedList<>();
         auxiliaryQueue = new LinkedList<>();
         blockedQueue = new LinkedList<>();
-        jobQueue=new LinkedList<>();
+        jobQueue = new LinkedList<>();
 
         for (Process process : processes) {
             jobQueue.add(process);
@@ -59,22 +59,20 @@ public class Scheduler extends Thread {
         this.timeSlice = timeSlice;
     }
 
-    private void updateGUI(){
+    private void updateGUI() {
         SwingUtilities.invokeLater(
-                    new Runnable() {
-                        public void run() {
-                            
-                            window.auxiliaryQueuePanel.repaint();
-                            timeline.repaint();
-                            window.readyQueuePanel.repaint();
-                            window.blockedQueuePanel.repaint();
-                            
-                        }
+                new Runnable() {
+                    public void run() {
+                        window.auxiliaryQueuePanel.repaint();
+                        timeline.repaint();
+                        window.readyQueuePanel.repaint();
+                        window.blockedQueuePanel.repaint();
+
                     }
-            );
+                }
+        );
     }
-    
-    
+
     @Override
     public void run() {
         totalTime = 0;
@@ -86,30 +84,28 @@ public class Scheduler extends Thread {
 
         Process currentProcess = null;
 
-        
-        
-        
-        
-        
+        for (Process p : jobQueue) {
+            p.setBlockedAt();
+        }
+
         while (executing) {
 
-            updateGUI();
-            
+            //updateGUI();
+
             /**
              * Look into the job Queue to find whether there's any new process
              */
-            
-            if(!jobQueue.isEmpty()){
-                Iterator<Process> iter=jobQueue.iterator();
-                
+            if (!jobQueue.isEmpty()) {
+                Iterator<Process> iter = jobQueue.iterator();
+
                 while (iter.hasNext()) {
                     Process p = iter.next();
-                    if (p.getArrivalTime()<=totalTime) {
+                    if (p.getArrivalTime() <= totalTime) {
                         iter.remove();
                         readyQueue.add(p);
                     }
                 }
-                
+
             }
 
             updateGUI();
@@ -127,9 +123,16 @@ public class Scheduler extends Thread {
                         auxiliaryQueue.add(p);
                     }
                 }
+
+                updateGUI();
+
+                try {
+                    sleep(500);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
             }
-            
-            updateGUI();
 
             //change the process
             time = System.currentTimeMillis();
@@ -151,13 +154,13 @@ public class Scheduler extends Thread {
 
             boolean is_blocked = false;
             if (currentProcess != null && !currentProcess.hasFinished()) {
-                
-                final int progress=(int)(((float)currentProcess.getExcecutedTime())
-                        /((float)currentProcess.getServiceTime())*100);
-                
-                final String p1=currentProcess.getName();
+
+                final int progress = (int) (((float) currentProcess.getExcecutedTime())
+                        / ((float) currentProcess.getServiceTime()) * 100);
+
+                final String p1 = currentProcess.getName();
                 final Color c1 = currentProcess.getColor();
-                
+
                 SwingUtilities.invokeLater(
                         new Runnable() {
                             public void run() {
@@ -166,10 +169,10 @@ public class Scheduler extends Thread {
                                 window.readyQueuePanel.repaint();
                                 window.blockedQueuePanel.repaint();
                                 window.currentProcessLabel.setBackground(c1);
-                                window.currentProcessLabel.setText("Current Process : "+p1);
+                                window.currentProcessLabel.setText("Current Process : " + p1);
                                 window.progressBar.setValue(progress);
-                                window.cpuTimeLabel.setText("CPU Time : "+
-                                    (System.currentTimeMillis()-startTime));
+                                window.cpuTimeLabel.setText("CPU Time : "
+                                        + (System.currentTimeMillis() - startTime));
                             }
                         }
                 );
@@ -177,23 +180,37 @@ public class Scheduler extends Thread {
                 /**
                  * Execute the process.
                  */
+                final String p2 = currentProcess.getName();
+                
+                SwingUtilities.invokeLater(
+                        new Runnable() {
+                            public void run() {
+                                window.logLabel.setText(p2+" Running ...");
+                            }
+                        }
+                );
                 is_blocked = currentProcess.execute(timeSlice);
 
                 /*
                  Update the table according to the changes in processes.
                  */
                 window.processes.add(currentProcess);
-
+                int width=(int)((((float)currentProcess.getLastExecutedSlice())/((float)timeSlice))*20);
+                   
+                window.timeSlots.add(width);
+                
                 tableModel.setValueAt(currentProcess.getArrivalTime(),
                         currentProcess.getProcessNumber() - 1, 2);
-                tableModel.setValueAt(currentProcess.getServiceTime() - currentProcess.getExcecutedTime()
-                        , currentProcess.getProcessNumber() - 1, 3);
+                tableModel.setValueAt(currentProcess.getServiceTime() - currentProcess.getExcecutedTime(),
+                        currentProcess.getProcessNumber() - 1, 3);
                 
-                final int progress2=(int)(((float)currentProcess.getExcecutedTime())
-                        /((float)currentProcess.getServiceTime())*100);
-                final String p2=currentProcess.getName();
+                tableModel.setValueAt(currentProcess.getWaitingTime(),
+                        currentProcess.getProcessNumber() - 1, 4);
+
+                final int progress2 = (int) (((float) currentProcess.getExcecutedTime())
+                        / ((float) currentProcess.getServiceTime()) * 100);
                 final Color c2 = currentProcess.getColor();
-                
+
                 SwingUtilities.invokeLater(
                         new Runnable() {
                             public void run() {
@@ -202,22 +219,31 @@ public class Scheduler extends Thread {
                                 window.blockedQueuePanel.repaint();
                                 window.auxiliaryQueuePanel.repaint();
                                 window.currentProcessLabel.setBackground(c2);
-                                window.currentProcessLabel.setText("Current Process : "+p2);
+                                window.currentProcessLabel.setText("Current Process : " + p2);
                                 window.progressBar.setValue(progress2);
-                                window.cpuTimeLabel.setText("CPU Time : "+
-                                    (System.currentTimeMillis()-startTime));
+                                window.cpuTimeLabel.setText("CPU Time : "
+                                        + (System.currentTimeMillis() - startTime));
+                                
                             }
                         }
                 );
                 if (is_blocked) {
                     blockedQueue.add(currentProcess);
                     currentProcess = null;
+                    
+                    SwingUtilities.invokeLater(
+                        new Runnable() {
+                            public void run() {
+                                window.logLabel.setText(p2+" Blocked ...");
+                            }
+                        }
+                    );
                 }
 
-            }
-            else if(currentProcess==null && readyQueue.isEmpty() && (window.processes.size()==0
-                    || window.processes.get(window.processes.size()-1)!=null)){
+            } else if (currentProcess == null && readyQueue.isEmpty() && (window.processes.size() == 0
+                    || window.processes.get(window.processes.size() - 1) != null)) {
                 window.processes.add(currentProcess);
+                window.timeSlots.add(0);
             }
 
             totalTime = (System.currentTimeMillis() - startTime);
@@ -236,6 +262,7 @@ public class Scheduler extends Thread {
                                 window.currentProcessLabel.setBackground(Color.white);
                                 window.currentProcessLabel.setText("Scheduler Finished");
                                 window.progressBar.setValue(0);
+                                window.logLabel.setText("Finished ...");
                             }
                         }
                 );

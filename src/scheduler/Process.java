@@ -20,11 +20,13 @@ public class Process{
     //arrival time to be set manually
     
     private int processNumber;
-    private int serviceTime,waitingTime,executedTime,block_at,blocked_for;
+    private int serviceTime,waitingTime,executedTime,blocked_for,block_at;
     Long lastExecutedTime,blocked_at,arrivalTime;
     private String name;
     boolean is_blocked,finished,blockedOnce;
     private Color color;
+    private long missingTime;
+    private long lastExecutedSlice;
    
     /**
      * All the time should be in milli seconds
@@ -48,14 +50,16 @@ public class Process{
         //set the block_at time. Process should be added to the blocked queue
         // when this time arrive.
         Random rand=new Random();
-        block_at=rand.nextInt(serviceTime-1)+1;
+        block_at=(rand.nextInt(serviceTime-1000)+100);
         
         //blocked_for determines, for how long the process to be kept blocked.
-        blocked_for=(rand.nextInt(5)+1)*1000;
+        blocked_for=(rand.nextInt(7)+1)*1000;
         
         executedTime=0;
         waitingTime=0;
-        lastExecutedTime=System.currentTimeMillis();
+        lastExecutedTime=(long)-1;
+        missingTime=0;
+        lastExecutedSlice=0L;
     }
     
     
@@ -75,6 +79,10 @@ public class Process{
         return color;
     }
     
+    
+    public long getLastExecutedSlice(){
+        return lastExecutedSlice;
+    }
     
     /**
      * Get the arrival time of the process.
@@ -117,6 +125,11 @@ public class Process{
     }
     
     
+    
+    public void setBlockedAt(){
+        //block_at=System.currentTimeMillis()+block_at;
+    }
+    
     /**
      * Return the waiting time of the given process.
      * @return 
@@ -141,7 +154,9 @@ public class Process{
      */
     public boolean hasFinished(){
         if(finished){
-            System.out.println("Process: "+name+" Arrival Time="+arrivalTime+" service time="+serviceTime+" executed time="+executedTime+" waiting time="+waitingTime);
+            System.out.println(name+" Block At :"+block_at+
+                    " executed time="+executedTime+" waiting time="+waitingTime);
+            
         }
         return finished;
     }
@@ -153,6 +168,9 @@ public class Process{
      * @return 
      */
     public boolean execute(int slice){
+        if(lastExecutedTime==-1){
+            lastExecutedTime=System.currentTimeMillis();
+        }
         
         //process is finished is the executed time is greater than service time.
         if(executedTime>=serviceTime){
@@ -164,7 +182,10 @@ public class Process{
         waitingTime+=(System.currentTimeMillis()-lastExecutedTime);
         
         int time;
-        if(executedTime+slice>=serviceTime){
+        if(missingTime!=0){
+            time=(int)missingTime;
+        }
+        else if(executedTime+slice>=serviceTime){
            time=serviceTime-executedTime; 
            finished=true;
         }
@@ -190,17 +211,26 @@ public class Process{
                     blocked_at=System.currentTimeMillis();
                     executedTime+=(System.currentTimeMillis()-startTime);
                     lastExecutedTime=System.currentTimeMillis();
+                    
+                    /**
+                     * Last executed slice is the time remaining of the process's
+                     * last time slice before being blocked.
+                     */
+                    lastExecutedSlice=System.currentTimeMillis()-startTime;
                     System.out.println("Process "+name+" blocked");
+                    missingTime=slice-(System.currentTimeMillis()-startTime);
                     return true;
                 }
                 
                 Thread.sleep(10);
             }
-            
         } catch (InterruptedException ex) {
             Logger.getLogger(Process.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        missingTime=0;
         executedTime+=time;
+        lastExecutedSlice=time;
         lastExecutedTime=System.currentTimeMillis();
         
         return false;
