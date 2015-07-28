@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -22,7 +24,7 @@ public class Scheduler extends Thread {
 
     private int processCount, timeSlice;
     private long totalTime;
-    Queue<Process> readyQueue, auxiliaryQueue;
+    Queue<Process> readyQueue, auxiliaryQueue,jobQueue;
     LinkedList<Process> blockedQueue;
     private final DefaultTableModel tableModel;
     private JPanel timeline;
@@ -43,9 +45,11 @@ public class Scheduler extends Thread {
         readyQueue = new LinkedList<>();
         auxiliaryQueue = new LinkedList<>();
         blockedQueue = new LinkedList<>();
+        jobQueue=new LinkedList<>();
 
         for (Process process : processes) {
-            readyQueue.add(process);
+            jobQueue.add(process);
+            //readyQueue.add(process);
         }
     }
 
@@ -54,30 +58,60 @@ public class Scheduler extends Thread {
         this.timeSlice = timeSlice;
     }
 
+    private void updateGUI(){
+        SwingUtilities.invokeLater(
+                    new Runnable() {
+                        public void run() {
+                            
+                            window.auxiliaryQueuePanel.repaint();
+                            timeline.repaint();
+                            window.readyQueuePanel.repaint();
+                            window.blockedQueuePanel.repaint();
+                            
+                        }
+                    }
+            );
+    }
+    
+    
     @Override
     public void run() {
         totalTime = 0;
 
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
         //time to keep track of time slices
         long time;
         boolean executing = true;
 
         Process currentProcess = null;
 
+        
+        
+        
+        
+        
         while (executing) {
 
-            SwingUtilities.invokeLater(
-                    new Runnable() {
-                        public void run() {
-                            timeline.repaint();
-                            window.readyQueuePanel.repaint();
-                            window.blockedQueuePanel.repaint();
-                            window.auxiliaryQueuePanel.repaint();
-                        }
+            updateGUI();
+            
+            /**
+             * Look into the job Queue to find whether there's any new process
+             */
+            
+            if(!jobQueue.isEmpty()){
+                Iterator<Process> iter=jobQueue.iterator();
+                
+                while (iter.hasNext()) {
+                    Process p = iter.next();
+                    if (p.getArrivalTime()<=totalTime) {
+                        iter.remove();
+                        readyQueue.add(p);
                     }
-            );
+                }
+                
+            }
 
+            updateGUI();
             /**
              * First we should check the blocked queue if it has any unblocked
              * processes. If yes add it to the auxiliary queue.
@@ -94,17 +128,7 @@ public class Scheduler extends Thread {
                 }
             }
             
-            SwingUtilities.invokeLater(
-                    new Runnable() {
-                        public void run() {
-                            window.auxiliaryQueuePanel.repaint();
-                            timeline.repaint();
-                            window.readyQueuePanel.repaint();
-                            window.blockedQueuePanel.repaint();
-                            
-                        }
-                    }
-            );
+            updateGUI();
 
             //change the process
             time = System.currentTimeMillis();
@@ -126,7 +150,6 @@ public class Scheduler extends Thread {
 
             boolean is_blocked = false;
             if (currentProcess != null && !currentProcess.hasFinished()) {
-                currentProcess.setArrivalTime(totalTime);
                 
                 final int progress=(int)(((float)currentProcess.getExcecutedTime())
                         /((float)currentProcess.getServiceTime())*100);
@@ -136,12 +159,14 @@ public class Scheduler extends Thread {
                 SwingUtilities.invokeLater(
                         new Runnable() {
                             public void run() {
+                                window.auxiliaryQueuePanel.repaint();
                                 timeline.repaint();
                                 window.readyQueuePanel.repaint();
                                 window.blockedQueuePanel.repaint();
-                                window.auxiliaryQueuePanel.repaint();
                                 window.currentProcessLabel.setText("Current Process : "+p1);
                                 window.progressBar.setValue(progress);
+                                window.cpuTimeLabel.setText("CPU Time : "+
+                                    (System.currentTimeMillis()-startTime));
                             }
                         }
                 );
@@ -171,6 +196,8 @@ public class Scheduler extends Thread {
                                 window.auxiliaryQueuePanel.repaint();
                                 window.currentProcessLabel.setText("Current Process : "+p2);
                                 window.progressBar.setValue(progress2);
+                                window.cpuTimeLabel.setText("CPU Time : "+
+                                    (System.currentTimeMillis()-startTime));
                             }
                         }
                 );
@@ -185,8 +212,20 @@ public class Scheduler extends Thread {
 
             //all the queues should be finished to finish the sheduler
             if (readyQueue.isEmpty() && auxiliaryQueue.isEmpty()
-                    && blockedQueue.isEmpty() && currentProcess == null) {
+                    && blockedQueue.isEmpty() && currentProcess == null && jobQueue.isEmpty()) {
                 executing = false;
+                SwingUtilities.invokeLater(
+                        new Runnable() {
+                            public void run() {
+                                timeline.repaint();
+                                window.readyQueuePanel.repaint();
+                                window.blockedQueuePanel.repaint();
+                                window.auxiliaryQueuePanel.repaint();
+                                window.currentProcessLabel.setText("Scheduler Finished");
+                                window.progressBar.setValue(0);
+                            }
+                        }
+                );
             }
 
         }

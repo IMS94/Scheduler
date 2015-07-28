@@ -32,9 +32,13 @@ public class Process{
      * @param serviceTime
      * @param name 
      */
-    public Process(int serviceTime,String name,int processNumber,Color color){
+    public Process(int serviceTime,int arrivalTime,String name,int processNumber,Color color){
         this.name=name;
         this.serviceTime=serviceTime;
+        
+        //set the arrival time as given
+        this.arrivalTime=(long)arrivalTime;
+        
         finished=false;
         blockedOnce=false;
         
@@ -51,7 +55,6 @@ public class Process{
         
         executedTime=0;
         waitingTime=0;
-        arrivalTime=-1L;
         lastExecutedTime=System.currentTimeMillis();
     }
     
@@ -71,17 +74,7 @@ public class Process{
     public Color getColor(){
         return color;
     }
-    /**
-     * Set the arrival time of a process
-     * Arrival time is only set once.
-     * @param arrivalTime 
-     */
-    public void setArrivalTime(long arrivalTime){
-        if(this.arrivalTime!=-1){
-            return;
-        }
-        this.arrivalTime=arrivalTime;
-    }
+    
     
     /**
      * Get the arrival time of the process.

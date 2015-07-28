@@ -43,26 +43,31 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="topRightPanel" max="32767" attributes="0"/>
               </Group>
-              <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="bottomPanel" max="32767" attributes="0"/>
-                      <Group type="102" attributes="0">
-                          <Component id="middlePanel" max="32767" attributes="0"/>
+              <Group type="102" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="bottomPanel" max="32767" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="middlePanel" max="32767" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="middleMiddlePanel" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="middleRightPanel" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                          <Component id="currentProcessLabel" min="-2" pref="280" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="middleMiddlePanel" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="middleRightPanel" min="-2" max="-2" attributes="0"/>
+                          <Component id="progressBar" min="-2" pref="262" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="170" max="-2" attributes="0"/>
+                          <Component id="cpuTimeLabel" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-              </Group>
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
-                  <Component id="currentProcessLabel" min="-2" pref="280" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="progressBar" min="-2" pref="262" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -87,6 +92,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="progressBar" pref="24" max="32767" attributes="0"/>
                       <Component id="currentProcessLabel" max="32767" attributes="0"/>
+                      <Component id="cpuTimeLabel" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -348,6 +354,11 @@
           </AuxValues>
         </Component>
         <Component class="javax.swing.JLabel" name="currentProcessLabel">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JLabel" name="cpuTimeLabel">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
           </AuxValues>
