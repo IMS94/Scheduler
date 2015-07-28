@@ -215,8 +215,8 @@ public class Scheduler extends Thread {
                 }
 
             }
-            else if(currentProcess==null && readyQueue.isEmpty() && window.processes.size()>0
-                    && window.processes.get(window.processes.size()-1)!=null){
+            else if(currentProcess==null && readyQueue.isEmpty() && (window.processes.size()==0
+                    || window.processes.get(window.processes.size()-1)!=null)){
                 window.processes.add(currentProcess);
             }
 
