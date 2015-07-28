@@ -32,7 +32,7 @@ public class MainWindow extends javax.swing.JFrame {
     private int processCount = 0;
     List<Process> processes;
     private Scheduler scheduler;
-    JPanel timeline, readyQueuePanel,blockedQueuePanel,auxiliaryQueuePanel;
+    JPanel timeline, readyQueuePanel, blockedQueuePanel, auxiliaryQueuePanel;
     private Color[] colors = {Color.BLUE, Color.RED, Color.GRAY, Color.ORANGE, Color.GREEN, Color.PINK, Color.YELLOW,
         Color.CYAN, Color.MAGENTA};
 
@@ -49,16 +49,16 @@ public class MainWindow extends javax.swing.JFrame {
                 super.paintComponent(g);
                 this.setBackground(Color.WHITE);
                 int cord = 0;
-                boolean onceIdle=false;
-                
+                boolean onceIdle = false;
+
                 for (Process p : processes) {
                     cord += 25;
-                    if(p==null && !onceIdle){
-                        
+                    if (p == null && !onceIdle) {
+
                         g.setColor(Color.BLACK);
-                        
+
                         g.drawRect(cord, 10, 20, 80);
-                        onceIdle=true;
+                        onceIdle = true;
                         continue;
                     }
                     g.setColor(p.getColor());
@@ -67,7 +67,7 @@ public class MainWindow extends javax.swing.JFrame {
                     g.setColor(Color.WHITE);
 
                     g.drawString("P " + p.getProcessNumber(), cord, 25);
-                    onceIdle=false;
+                    onceIdle = false;
                 }
             }
         };
@@ -81,9 +81,9 @@ public class MainWindow extends javax.swing.JFrame {
                 this.setBackground(Color.WHITE);
                 int cord = 0;
                 if (scheduler != null) {
-                    int x=1;
-                    for(Process p: scheduler.readyQueue) {
-                        
+                    int x = 1;
+                    for (Process p : scheduler.readyQueue) {
+
                         cord += 25;
                         g.setColor(p.getColor());
                         g.fillRect(cord, 10, 20, 80);
@@ -91,7 +91,7 @@ public class MainWindow extends javax.swing.JFrame {
                         g.setColor(Color.WHITE);
 
                         g.drawString("P " + p.getProcessNumber(), cord, 25);
-                        g.drawString(Integer.toString(x), cord+8, 50);
+                        g.drawString(Integer.toString(x), cord + 8, 50);
                         x++;
                     }
                 }
@@ -100,8 +100,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         readyQueuePanel.setSize(300, 100);
         middlePanel.add(readyQueuePanel);
-        
-        
+
         blockedQueuePanel = new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
@@ -109,9 +108,9 @@ public class MainWindow extends javax.swing.JFrame {
                 this.setBackground(Color.WHITE);
                 int cord = 0;
                 if (scheduler != null) {
-                    int x=1;
-                    for(Process p: scheduler.blockedQueue) {
-                        
+                    int x = 1;
+                    for (Process p : scheduler.blockedQueue) {
+
                         cord += 25;
                         g.setColor(p.getColor());
                         g.fillRect(cord, 10, 20, 80);
@@ -119,7 +118,7 @@ public class MainWindow extends javax.swing.JFrame {
                         g.setColor(Color.WHITE);
 
                         g.drawString("P " + p.getProcessNumber(), cord, 25);
-                        g.drawString(Integer.toString(x), cord+8, 50);
+                        g.drawString(Integer.toString(x), cord + 8, 50);
                         x++;
                     }
                 }
@@ -128,8 +127,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         blockedQueuePanel.setSize(300, 100);
         middleRightPanel.add(blockedQueuePanel);
-        
-        
+
         auxiliaryQueuePanel = new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
@@ -137,9 +135,9 @@ public class MainWindow extends javax.swing.JFrame {
                 this.setBackground(Color.WHITE);
                 int cord = 0;
                 if (scheduler != null) {
-                    int x=1;
-                    for(Process p: scheduler.auxiliaryQueue) {
-                        System.out.println("P"+x);
+                    int x = 1;
+                    for (Process p : scheduler.auxiliaryQueue) {
+                        System.out.println("P" + x);
                         cord += 25;
                         g.setColor(p.getColor());
                         g.fillRect(cord, 10, 20, 80);
@@ -147,7 +145,7 @@ public class MainWindow extends javax.swing.JFrame {
                         g.setColor(Color.WHITE);
 
                         g.drawString("P " + p.getProcessNumber(), cord, 25);
-                        g.drawString(Integer.toString(x), cord+8, 50);
+                        g.drawString(Integer.toString(x), cord + 8, 50);
                         x++;
                     }
                 }
@@ -221,7 +219,7 @@ public class MainWindow extends javax.swing.JFrame {
         jLabel1.setText("Round Robin Sceduling Simulator");
 
         clearButton.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        clearButton.setText("Clear Process Table");
+        clearButton.setText("Clear");
         clearButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clearButtonActionPerformed(evt);
@@ -467,7 +465,7 @@ public class MainWindow extends javax.swing.JFrame {
         int serviceTime = (rand.nextInt(10) + 3) * 1000;
 
         //process should be given a random arrival time.
-        Process process = new Process(serviceTime,(rand.nextInt(20))*1000, "Process " + processCount, processCount,
+        Process process = new Process(serviceTime, (rand.nextInt(20)) * 1000, "Process " + processCount, processCount,
                 colors[processCount - 1]);
 
         Object row[] = new Object[4];
@@ -493,24 +491,18 @@ public class MainWindow extends javax.swing.JFrame {
 
         String ts = txtTimeSlice.getText();
 
-        if (ts == null) {
+        if (ts.equals("")) {
             ts = "4";
-        } else {
-
-            try {
-                scheduler = new Scheduler(p, Integer.parseInt(ts)*1000, (DefaultTableModel) table.getModel(), timeline, this);
-                processes.clear();
-                scheduler.start();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Please enter a valid time slice", "Invalid time slice", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
         }
 
-
-
-
+        try {
+            scheduler = new Scheduler(p, Integer.parseInt(ts) * 1000, (DefaultTableModel) table.getModel(), timeline, this);
+            processes.clear();
+            scheduler.start();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Please enter a valid time slice", "Invalid time slice", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
 
 
     }//GEN-LAST:event_startButtonActionPerformed
@@ -526,6 +518,9 @@ public class MainWindow extends javax.swing.JFrame {
         processes = new ArrayList<>();
         processCount = 0;
         scheduler = null;
+
+        middleMiddlePanel.revalidate();
+        middleMiddlePanel.repaint();
 
         System.gc();
 
