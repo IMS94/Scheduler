@@ -51,8 +51,10 @@ public class MainWindow extends javax.swing.JFrame {
                 for (Process p : processes) {
                     cord += 25;
                     if(p==null && !onceIdle){
+                        
                         g.setColor(Color.BLACK);
-                        g.fillRect(cord, 10, 20, 80);
+                        
+                        g.drawRect(cord, 10, 20, 80);
                         onceIdle=true;
                         continue;
                     }
