@@ -5,6 +5,7 @@
  */
 package scheduler;
 
+import java.awt.Color;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -155,6 +156,7 @@ public class Scheduler extends Thread {
                         /((float)currentProcess.getServiceTime())*100);
                 
                 final String p1=currentProcess.getName();
+                final Color c1 = currentProcess.getColor();
                 
                 SwingUtilities.invokeLater(
                         new Runnable() {
@@ -163,6 +165,7 @@ public class Scheduler extends Thread {
                                 timeline.repaint();
                                 window.readyQueuePanel.repaint();
                                 window.blockedQueuePanel.repaint();
+                                window.currentProcessLabel.setBackground(c1);
                                 window.currentProcessLabel.setText("Current Process : "+p1);
                                 window.progressBar.setValue(progress);
                                 window.cpuTimeLabel.setText("CPU Time : "+
@@ -189,6 +192,7 @@ public class Scheduler extends Thread {
                 final int progress2=(int)(((float)currentProcess.getExcecutedTime())
                         /((float)currentProcess.getServiceTime())*100);
                 final String p2=currentProcess.getName();
+                final Color c2 = currentProcess.getColor();
                 
                 SwingUtilities.invokeLater(
                         new Runnable() {
@@ -197,6 +201,7 @@ public class Scheduler extends Thread {
                                 window.readyQueuePanel.repaint();
                                 window.blockedQueuePanel.repaint();
                                 window.auxiliaryQueuePanel.repaint();
+                                window.currentProcessLabel.setBackground(c2);
                                 window.currentProcessLabel.setText("Current Process : "+p2);
                                 window.progressBar.setValue(progress2);
                                 window.cpuTimeLabel.setText("CPU Time : "+
@@ -228,6 +233,7 @@ public class Scheduler extends Thread {
                                 window.readyQueuePanel.repaint();
                                 window.blockedQueuePanel.repaint();
                                 window.auxiliaryQueuePanel.repaint();
+                                window.currentProcessLabel.setBackground(Color.white);
                                 window.currentProcessLabel.setText("Scheduler Finished");
                                 window.progressBar.setValue(0);
                             }
