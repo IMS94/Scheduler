@@ -171,6 +171,9 @@ public class Scheduler extends Thread {
                         }
                 );
 
+                /**
+                 * Execute the process.
+                 */
                 is_blocked = currentProcess.execute(timeSlice);
 
                 /*
@@ -206,6 +209,10 @@ public class Scheduler extends Thread {
                     currentProcess = null;
                 }
 
+            }
+            else if(currentProcess==null && readyQueue.isEmpty() && window.processes.size()>0
+                    && window.processes.get(window.processes.size()-1)!=null){
+                window.processes.add(currentProcess);
             }
 
             totalTime = (System.currentTimeMillis() - startTime);

@@ -46,15 +46,23 @@ public class MainWindow extends javax.swing.JFrame {
                 super.paintComponent(g);
                 this.setBackground(Color.WHITE);
                 int cord = 0;
+                boolean onceIdle=false;
+                
                 for (Process p : processes) {
                     cord += 25;
+                    if(p==null && !onceIdle){
+                        g.setColor(Color.BLACK);
+                        g.fillRect(cord, 10, 20, 80);
+                        onceIdle=true;
+                        continue;
+                    }
                     g.setColor(p.getColor());
                     g.fillRect(cord, 10, 20, 80);
 
                     g.setColor(Color.WHITE);
 
                     g.drawString("P " + p.getProcessNumber(), cord, 25);
-
+                    onceIdle=false;
                 }
             }
         };
