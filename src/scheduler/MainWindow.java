@@ -5,6 +5,8 @@
  */
 package scheduler;
 
+import com.jtattoo.plaf.aluminium.AluminiumLookAndFeel;
+import com.jtattoo.plaf.graphite.GraphiteLookAndFeel;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -18,6 +20,7 @@ import java.util.Random;
 //import javafx.print.Collation;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -562,6 +565,11 @@ public class MainWindow extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                try {
+                    UIManager.setLookAndFeel(new GraphiteLookAndFeel());
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                }
                 new MainWindow().setVisible(true);
             }
         });
