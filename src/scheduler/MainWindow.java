@@ -7,6 +7,9 @@ package scheduler;
 
 import com.jtattoo.plaf.aluminium.AluminiumLookAndFeel;
 import com.jtattoo.plaf.graphite.GraphiteLookAndFeel;
+import com.jtattoo.plaf.hifi.HiFiLookAndFeel;
+import com.jtattoo.plaf.luna.LunaLookAndFeel;
+import com.jtattoo.plaf.smart.SmartLookAndFeel;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -444,10 +447,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         DefaultTableModel dt = (DefaultTableModel) table.getModel();
         int rows = dt.getRowCount();
-        for (int i = rows - 1; i >= 0; i--) {
-            dt.removeRow(i);
-        }
-
+       
         System.out.println("Scheduler stopped...");
         System.out.println("");
     }//GEN-LAST:event_stopButtonActionPerformed
@@ -482,6 +482,7 @@ public class MainWindow extends javax.swing.JFrame {
         if (processCount < 5) {
 
             JOptionPane.showMessageDialog(null, "Please add five or more processes and continue", "Invalid process number", JOptionPane.INFORMATION_MESSAGE);
+            timeline.repaint();
             return;
         }
         Process[] p = new Process[processes.size()];
@@ -517,9 +518,13 @@ public class MainWindow extends javax.swing.JFrame {
         processes = new ArrayList<>();
         processCount = 0;
         scheduler = null;
-
+        timeline.repaint();
+        middlePanel.repaint();
+        middleRightPanel.repaint();
         middleMiddlePanel.revalidate();
         middleMiddlePanel.repaint();
+        cpuTimeLabel.setText("CPU Time :0");
+       
 
         System.gc();
 
