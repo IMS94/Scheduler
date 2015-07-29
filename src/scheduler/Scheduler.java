@@ -25,8 +25,8 @@ public class Scheduler extends Thread {
 
     private int processCount, timeSlice;
     private long totalTime;
-    Queue<Process> readyQueue, auxiliaryQueue, jobQueue;
-    LinkedList<Process> blockedQueue;
+    Queue<Process> readyQueue, auxiliaryQueue, jobQueue,blockedQueue;
+    
     private final DefaultTableModel tableModel;
     private JPanel timeline;
     private MainWindow window;
